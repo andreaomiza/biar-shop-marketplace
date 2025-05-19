@@ -1,0 +1,48 @@
+name: Backend + Frontend Build + Ngrok (testing)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  run-server:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install backend deps
+        working-directory: ./backend
+        run: npm install
+
+      - name: Install frontend deps
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Install ngrok CLI
+        run: |
+          curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
+          echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
+          sudo apt update && sudo apt install ngrok
+
+      - name: Run backend + ngrok
+        working-directory: ./backend
+        run: |
+          # Ejecutar el backend en background
+          node server.js &
+          sleep 5
+          # Ejecutar ngrok para exponer el puerto 3000 (ajusta el puerto si usas otro)
+          ngrok http 3000 --log=stdout &
+          sleep 30
+        env:
+          NGROK_AUTHTOKEN:  2xEyAICfa2nw1bvbOIDrSSMousc_87WcXGNiM2d34RmerjgnR 
