@@ -13,7 +13,12 @@ import ServiceRequest from '../pages/ServiceRequest';
 const AppRoutes = () => {
   const { user, loading } = useAuth();
 
-  if (loading) return <div className="text-center mt-10">Cargando...</div>;
+  if (loading) return (
+  <div className="flex justify-center items-center min-h-screen">
+    <p className="text-lg font-medium">Cargando datos...</p>
+  </div>
+);
+
 
   // Ruta privada solo si está logueado
   const PrivateRoute = ({ children }) => {

@@ -1,4 +1,3 @@
-// src/context/AuthProvider.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import AuthContext from './AuthContext';
 import api from '../services/api.js';
@@ -10,6 +9,7 @@ import {
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // ✅ loading añadido
 
   const fetchUser = useCallback(async () => {
     try {
@@ -17,7 +17,9 @@ const AuthProvider = ({ children }) => {
       setUser(res.data.user);
     // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      logout();
+      logout(); // si falla, limpia token y usuario
+    } finally {
+      setLoading(false); // ✅ siempre termina carga
     }
   }, []);
 
@@ -25,47 +27,48 @@ const AuthProvider = ({ children }) => {
     const token = getTokenFromStorage();
     if (token) {
       fetchUser();
+    } else {
+      setLoading(false); // ✅ si no hay token, carga termina
     }
   }, [fetchUser]);
-const login = async (email, password) => {
-  try {
-    const res = await api.post('/auth/login', { email, password });
-    const { token, user } = res.data;
-    setTokenToStorage(token);
-    setUser(user);
-    return {
-      success: true,
-      user,
-    };
-  } catch (error) {
-    console.error("Error en login:", error.response?.data || error.message);
-    return {
-      success: false,
-      message: error.response?.data?.message || "Error inesperado",
-    };
-  }
-};
 
-const register = async (formData) => {
-  try {
-    const res = await api.post('/auth/register', formData);
-    const { token, user } = res.data;
+  const login = async (email, password) => {
+    try {
+      const res = await api.post('/auth/login', { email, password });
+      const { token, user } = res.data;
+      setTokenToStorage(token);
+      setUser(user);
+      return {
+        success: true,
+        user,
+      };
+    } catch (error) {
+      console.error("Error en login:", error.response?.data || error.message);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Error inesperado",
+      };
+    }
+  };
 
-    setTokenToStorage(token);
-    setUser(user);
-
-    return {
-      success: res.status === 200 || res.status === 201,
-      user,
-    };
-  } catch (error) {
-    console.error("Error en registro:", error.response?.data || error.message);
-    return {
-      success: false,
-      message: error.response?.data?.message || "Error inesperado",
-    };
-  }
-};
+  const register = async (formData) => {
+    try {
+      const res = await api.post('/auth/register', formData);
+      const { token, user } = res.data;
+      setTokenToStorage(token);
+      setUser(user);
+      return {
+        success: res.status === 200 || res.status === 201,
+        user,
+      };
+    } catch (error) {
+      console.error("Error en registro:", error.response?.data || error.message);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Error inesperado",
+      };
+    }
+  };
 
   const logout = () => {
     setUser(null);
@@ -73,11 +76,10 @@ const register = async (formData) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, register }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export default AuthProvider;
-

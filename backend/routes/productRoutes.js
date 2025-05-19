@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
+const { authMiddleware, roleMiddleware } = require('../middleware/authMiddleware');
+const upload = require('../middleware/uploadMiddleware'); // multer configurado para subir archivos
+const productController = require('../controllers/productController');
 
 // GET /api/products - Obtener todos los productos públicos
 router.get('/', async (req, res) => {
@@ -12,32 +15,17 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST /api/products - Crear un nuevo producto
-router.post('/', async (req, res) => {
-  try {
-    const { title, description, price, category, fileUrl, imageUrl, seller } = req.body;
-
-    if (!title || !price || !category || !fileUrl || !seller) {
-      return res.status(400).json({ message: 'Título, precio, categoría, archivo y vendedor son obligatorios' });
-    }
-
-    const newProduct = new Product({
-      title,
-      description,
-      price,
-      category,
-      fileUrl,
-      imageUrl,
-      seller,
-    });
-
-    const saved = await newProduct.save();
-    res.status(201).json(saved);
-  } catch (err) {
-    res.status(500).json({ message: 'Error al crear producto', error: err.message });
-  }
-});
+// POST /api/products - Crear un nuevo producto (solo vendedores autenticados)
+router.post(
+  '/',
+  authMiddleware,
+  roleMiddleware('vendedor'),
+  upload.fields([
+    { name: 'file', maxCount: 1 },
+    { name: 'image', maxCount: 1 }
+  ]),
+  productController.createProduct
+);
 
 module.exports = router;
-
 

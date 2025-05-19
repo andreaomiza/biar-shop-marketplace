@@ -1,14 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const authMiddleware = require('../middleware/authMiddleware');
+const { authMiddleware, roleMiddleware } = require('../middleware/authMiddleware');
 
-// GET /api/seller/dashboard - Datos del vendedor
-router.get('/dashboard', authMiddleware, (req, res) => {
-  if (req.user.role !== 'vendedor') {
-    return res.status(403).json({ message: 'Solo accesible para vendedores' });
-  }
-
-  // Datos de ejemplo, deberías reemplazar por estadísticas reales del vendedor
+// GET /api/seller/dashboard - Datos solo para vendedores
+router.get('/dashboard', authMiddleware, roleMiddleware('vendedor'), (req, res) => {
+  // Datos de ejemplo, reemplaza con datos reales
   res.json({
     ventasTotales: 120,
     serviciosSolicitados: 35,
@@ -17,3 +13,4 @@ router.get('/dashboard', authMiddleware, (req, res) => {
 });
 
 module.exports = router;
+

@@ -2,12 +2,8 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// 💡 Verifica que la clave JWT esté correctamente cargada
-console.log("✅ JWT_SECRET desde authController:", process.env.JWT_SECRET);
-
 exports.register = async (req, res) => {
   const { email, password, username, role } = req.body;
-  console.log("📩 Datos recibidos en register:", req.body);
 
   try {
     // Verificar existencia previa por email o username
@@ -28,8 +24,6 @@ exports.register = async (req, res) => {
       password: hashedPassword,
       role
     });
-
-    console.log("📝 Usuario a guardar:", newUser);
 
     await newUser.save();
 
@@ -52,14 +46,12 @@ exports.register = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('❌ Error en register:', error.message, error.stack);
     res.status(500).json({ message: 'Error en el servidor' });
   }
 };
 
 exports.login = async (req, res) => {
   const { email, password } = req.body;
-  console.log("🔐 Intento de login con:", email);
 
   try {
     const user = await User.findOne({ email });
@@ -85,10 +77,6 @@ exports.login = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error("❌ Error en login:", error.message, error.stack);
     res.status(500).json({ message: 'Error en el servidor' });
   }
 };
-
-
-

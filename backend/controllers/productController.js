@@ -1,54 +1,51 @@
 const Product = require('../models/Product');
 
-exports.createProduct = async (req, res) => {
+const createProduct = async (req, res) => {
   try {
-    const { title, description, price, category, fileUrl, imageUrl, isPublic } = req.body;
+    const { title, description, price, category, isPublic } = req.body;
 
-    if (!title || !price || !category || !fileUrl) {
-      return res.status(400).json({ message: 'Título, precio, categoría y archivo son obligatorios' });
+    // Validar presencia de usuario autenticado
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: 'Usuario no autenticado' });
     }
 
-    const newProduct = new Product({
+    // Validar campos obligatorios
+    if (!title || !price || !category) {
+      return res.status(400).json({ message: 'Faltan campos obligatorios: título, precio o categoría' });
+    }
+
+    // Validar archivos
+    if (!req.files || !req.files['file'] || !req.files['image']) {
+      return res.status(400).json({ message: 'Faltan archivos requeridos: archivo principal o imagen' });
+    }
+
+    const file = req.files['file'][0];
+    const image = req.files['image'][0];
+
+    // Construir URLs relativas
+    const fileUrl = `/uploads/${file.filename}`;
+    const imageUrl = `/uploads/${image.filename}`;
+
+    const product = new Product({
       title,
       description,
-      price,
+      price: parseFloat(price),
       category,
       fileUrl,
       imageUrl,
-      isPublic,
-      seller: req.user.id, // ← Se asigna automáticamente el usuario autenticado
+      isPublic: isPublic === 'true' || isPublic === true,
+      seller: req.user._id,
     });
 
-    const savedProduct = await newProduct.save();
-    res.status(201).json(savedProduct);
-  } catch (err) {
-    console.error("❌ Error al crear producto:", err.message);
-    res.status(500).json({ message: 'Error al crear producto' });
+    await product.save();
+    res.status(201).json(product);
+
+  } catch (error) {
+    console.error('Error al crear producto:', error);
+    res.status(500).json({ message: 'Error interno al crear producto', error: error.message });
   }
 };
 
-
-exports.getAllProducts = async (req, res) => {
-  try {
-    const products = await Product.find().populate('seller', 'email username');
-    res.json(products);
-  } catch (err) {
-    console.error("❌ Error al obtener los productos:", err.message);
-    res.status(500).json({ message: 'Error al obtener los productos' });
-  }
-};
-
-exports.getProductById = async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id).populate('seller', 'email username');
-    if (!product) return res.status(404).json({ message: 'Producto no encontrado' });
-
-    res.json(product);
-  } catch (err) {
-    console.error("❌ Error al obtener producto por ID:", err.message);
-    res.status(500).json({ message: 'Error al obtener el producto' });
-  }
-};
-
+module.exports = { createProduct };
 
 
