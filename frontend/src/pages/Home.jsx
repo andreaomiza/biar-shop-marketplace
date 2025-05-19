@@ -2,10 +2,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer.jsx';
+import Navbar from '../components/Navbar.jsx'; // Importa el Navbar
 
 const Home = () => {
   return (
     <div className="min-h-screen bg-gradient-to-r from-[#ff0044] via-[#e00068] to-[#ff0044] text-white flex flex-col">
+      <Navbar />
+
       {/* Banner Principal */}
       <header className="flex flex-col items-center justify-center py-20 px-4 text-center">
         <h1 className="text-5xl font-extrabold mb-4">
@@ -84,7 +87,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <Footer />
     </div>
   );

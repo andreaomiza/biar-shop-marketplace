@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, ShoppingCart, Globe } from 'lucide-react';
+import { Menu, X, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const PRODUCTS = ['Audiolibros', 'Fuentes', 'Plantillas Webs', 'Samplers', 'ViRemix'];
@@ -19,10 +19,13 @@ const Navbar = () => {
   return (
     <nav className="bg-[#000414] text-white shadow-md fixed w-full z-50" role="navigation" aria-label="Main navigation">
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-        <Link to="/" className="text-xl font-bold text-[#ff0044]">Biartshop</Link>
+        <Link to="/" className="text-xl font-bold text-[#ff0044]">
+          Biartshop
+        </Link>
 
         {/* Desktop menu */}
         <div className="hidden md:flex items-center gap-6">
+          {/* Productos dropdown */}
           <div className="relative group">
             <button
               aria-haspopup="true"
@@ -50,6 +53,7 @@ const Navbar = () => {
             </div>
           </div>
 
+          {/* Servicios dropdown */}
           <div className="relative group">
             <button
               aria-haspopup="true"
@@ -77,11 +81,20 @@ const Navbar = () => {
             </div>
           </div>
 
-          <Link to="/tiendas" className="hover:text-[#e00068]">{t('Tiendas')}</Link>
-          <Link to="/faq" className="hover:text-[#e00068]">{t('FAQ')}</Link>
-          <Link to="/login" className="hover:text-[#e00068]">{t('Iniciar sesión')}</Link>
-          <Link to="/register" className="hover:text-[#e00068]">{t('Registrarse')}</Link>
+          <Link to="/marketplace" className="hover:text-[#e00068]">
+            {t('Marketplace')}
+          </Link>
+          <Link to="/faq" className="hover:text-[#e00068]">
+            {t('FAQ')}
+          </Link>
+          <Link to="/login" className="hover:text-[#e00068]">
+            {t('Iniciar sesión')}
+          </Link>
+          <Link to="/register" className="hover:text-[#e00068]">
+            {t('Registrarse')}
+          </Link>
 
+          {/* Botón para cambiar idioma */}
           <button
             onClick={toggleLang}
             className="hover:text-[#e00068] flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#e00068]"
@@ -89,11 +102,6 @@ const Navbar = () => {
           >
             <Globe size={16} />
             {i18n.language.toUpperCase()}
-          </button>
-
-          <button className="relative hover:text-[#e00068]" aria-label="Ver carrito de compras">
-            <ShoppingCart size={20} />
-            {/* Aquí puedes añadir contador si quieres */}
           </button>
         </div>
 
@@ -125,7 +133,11 @@ const Navbar = () => {
             {showProducts && (
               <div id="mobile-products-menu" className="pl-4 space-y-1">
                 {PRODUCTS.map((item) => (
-                  <Link key={item} to={`/productos/${item.toLowerCase()}`} className="block hover:text-[#e00068]">
+                  <Link
+                    key={item}
+                    to={`/productos/${item.toLowerCase()}`}
+                    className="block hover:text-[#e00068]"
+                  >
                     {item}
                   </Link>
                 ))}
@@ -145,7 +157,11 @@ const Navbar = () => {
             {showServices && (
               <div id="mobile-services-menu" className="pl-4 space-y-1">
                 {SERVICES.map((item) => (
-                  <Link key={item} to={`/servicios/${item.toLowerCase()}`} className="block hover:text-[#e00068]">
+                  <Link
+                    key={item}
+                    to={`/servicios/${item.toLowerCase()}`}
+                    className="block hover:text-[#e00068]"
+                  >
                     {item}
                   </Link>
                 ))}
@@ -153,10 +169,19 @@ const Navbar = () => {
             )}
           </div>
 
-          <Link to="/tiendas" className="hover:text-[#e00068]">{t('Tiendas')}</Link>
-          <Link to="/faq" className="hover:text-[#e00068]">{t('FAQ')}</Link>
-          <Link to="/login" className="hover:text-[#e00068]">{t('Iniciar sesión')}</Link>
-          <Link to="/register" className="hover:text-[#e00068]">{t('Registrarse')}</Link>
+          <Link to="/tiendas" className="hover:text-[#e00068]">
+            {t('Tiendas')}
+          </Link>
+          <Link to="/faq" className="hover:text-[#e00068]">
+            {t('FAQ')}
+          </Link>
+          <Link to="/login" className="hover:text-[#e00068]">
+            {t('Iniciar sesión')}
+          </Link>
+          <Link to="/register" className="hover:text-[#e00068]">
+            {t('Registrarse')}
+          </Link>
+
           <button
             onClick={toggleLang}
             className="flex items-center gap-1 hover:text-[#e00068] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#e00068]"
@@ -172,4 +197,5 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
 
